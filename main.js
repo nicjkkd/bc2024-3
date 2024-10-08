@@ -13,19 +13,48 @@ const input = options.input;
 const output = options.output;
 const display = options.display;
 
-// Перевірка на обов'язковий параметр
 if (!input) {
   console.error("Please, specify input file");
   return;
 }
 
-// Перевірка на існування файлу
 if (!fs.existsSync(input)) {
   console.error("Cannot find input file");
   return;
 }
 
-// Якщо жоден необов'язковий параметр не вказано — нічого не робимо
 if (!output && !display) {
   return;
+}
+
+const data = JSON.parse(
+  fs.readFileSync(input, {
+    encoding: "utf-8",
+    flag: "r",
+  })
+);
+
+const filteredTheLowestData = data.reduce((accumulator, currentElement) => {
+  return accumulator.value < currentElement.value
+    ? accumulator
+    : currentElement;
+});
+
+const result = `${filteredTheLowestData.txt}: ${filteredTheLowestData.value}`;
+
+if (display && output) {
+  console.log(result);
+  fs.writeFileSync(output, result, {
+    encoding: "utf-8",
+    flag: "w",
+    flush: true,
+  });
+} else if (display && !output) {
+  console.log(result);
+} else if (!display && output) {
+  fs.writeFileSync(output, result, {
+    encoding: "utf-8",
+    flag: "w",
+    flush: true,
+  });
 }
